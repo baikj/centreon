@@ -4,9 +4,9 @@
 Using packages
 ==============
 
-Centreon supplies RPM for its products via the Centreon Open Sources version available free of charge on our repository (ex CES).
+Centreon provides RPM for its products through the Centreon Open Sources version available free of charge on our repository (ex CES).
 
-These packages have been successfully tested on CentOS and Red Hat environments in 6.x and 7.x versions.
+These packages have been successfully tested on CentOS and Red Hat environments 7.x version.
 
 *****************
 Pre-install steps
@@ -25,19 +25,39 @@ SELinux should be disabled; for this, you have to modify the file */etc/selinux/
 Repository install
 ******************
 
-To install Centreon software from the repository, you should first install the file linked to the repository.
+Redhat Software collections repository
+--------------------------------------
 
-Perform the following command from a user with sufficient rights.
+To install Centreon you will need to install the official software collections repository supported by Redhat.
 
-Centreon Repository
--------------------
+.. note::
+    Software collections are required in order to install php 7 and libs (Centreon requirement)
 
-For CentOS 7.
+To do so, perform the following command with an user granted with sufficient rights.
+
+Software collections repository installation.
 
 ::
 
-   $ wget http://yum.centreon.com/standard/3.4/el7/stable/noarch/RPMS/centreon-release-3.4-4.el7.centos.noarch.rpm
-   $ yum install --nogpgcheck centreon-release-3.4-4.el7.centos.noarch.rpm
+   $ yum install centos-release-scl
+
+
+The repository is now installed.
+
+Centreon repository
+-------------------
+
+To install Centreon software from the repository, you should first install centreon-release package
+which will provide the repository file.
+
+Perform the following command with an user granted with sufficient rights.
+
+Centreon repository installation.
+
+::
+
+   $ wget http://yum.centreon.com/standard/18.9/el7/stable/noarch/RPMS/centreon-release-18.9.el7.centos.noarch.rpm
+   $ yum install --nogpgcheck centreon-release-18.9.el7.centos.noarch.rpm
 
 
 The repository is now installed.
@@ -47,7 +67,7 @@ The repository is now installed.
 Install a central server
 ************************
 
-The chapter describes the installation of a Centreon central server.
+This chapter describes the installation of a Centreon central server.
 
 Perform the command:
 
@@ -68,7 +88,7 @@ Perform the command:
 
  $ yum install centreon-poller-centreon-engine
 
-The communication between a central server and a poller server is by SSH.
+The communication between a central server and a poller server is made by SSH.
 
 You should exchange the SSH keys between the servers.
 
@@ -102,7 +122,7 @@ Perform the command:
 PHP timezone
 ------------
 
-PHP timezone should be set; go to /etc/php.d directory and create a file named php-timezone.ini which contains the following line :
+PHP timezone should be set; go to /etc/opt/rh/rh-php71/php.d directory and create a file named php-timezone.ini which contains the following line :
 
 ::
 
@@ -110,30 +130,30 @@ PHP timezone should be set; go to /etc/php.d directory and create a file named p
 
 After saving the file, please don't forget to restart apache server.
 
+::
+
+    systemctl restart httpd
+
 Firewall
 --------
 
 Add firewall rules or disable it. To disable it execute following commands:
 
-* **iptables** (CentOS v6) ::
-
-    # /etc/init.d/iptables save
-    # /etc/init.d/iptables stop
-    # chkconfig iptables off
-
-* **firewalld** (CentOS v7) ::
+**firewalld** ::
 
     # systemctl stop firewalld
     # systemctl disable firewalld
     # systemctl status firewalld
 
-DataBase Management System
+Database management system
 --------------------------
 
 The MySQL database server should be available to complete installation (locally or not). MariaDB is recommended.
 
-For CentOS / RHEL in version 7, it is necessary to modify **LimitNOFILE** limitation.
+It is necessary to modify **LimitNOFILE** limitation.
 Setting this option into /etc/my.cnf will NOT work.
+
+Perform instead:
 
 ::
 
@@ -147,25 +167,22 @@ Launch services during the system startup
 
 Enable the automatically start of services during the system startup.
 
-Execute these commands on central server.
-
- **CentOS v6** ::
-
-    # chkconfig httpd on
-    # chkconfig snmpd on
-    # chkconfig mysql on
-
-* **CentOS v7** ::
+Execute these commands on central server ::
 
     # systemctl enable httpd.service
     # systemctl enable snmpd.service
     # systemctl enable mysql.service
+    # systemctl enable rh-php71-php-fpm
 
 .. note::
-    If MySQL database is on a dedicated server, execute the enable command of mysql on DB server.
+    If MySQL database is on a dedicated server, execute the enable command of mysql on the database server.
 
 Conclude installation
 ---------------------
+
+Before starting the web installation process you will need to execute ::
+
+    # systemctl start rh-php71-php-fpm
 
 :ref:`click here to finalise the installation process <installation_web_ces>`.
 
